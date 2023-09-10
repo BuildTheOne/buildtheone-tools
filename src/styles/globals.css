@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  h1 {
+    @apply font-bold text-3xl p-2 text-center;
+  }
+}
+
+@layer components {
+  .main {
+    @apply flex flex-col gap-4 md:gap-8 items-center;
+  }
+}
