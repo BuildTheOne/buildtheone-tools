@@ -29,6 +29,7 @@
     "@tanstack/react-query": "^4.0.0",
     "@tanstack/react-query-devtools": "^4.0.0",
     "autoprefixer": "^10.0.0",
+    "cookies-next": "^3.0.0",
     "eslint-config-prettier": "^8.0.0",
     "husky": ">=7",
     "lint-staged": ">=10",
