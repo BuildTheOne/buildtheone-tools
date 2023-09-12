@@ -1,116 +1,23 @@
-import {
-  lowerCaseChar,
-  numberChar,
-  specialChar,
-  upperCaseChar,
-} from "@/src/constant/PasswordGenerator/charset";
+import { specialChar } from "@/src/constant/PasswordGenerator/charset";
 import { passwordLengthOption } from "@/src/constant/PasswordGenerator/options";
-import { IFormInput } from "@/src/types/passwordGeneratorType";
+import { usePasswordGenerator } from "@/src/hooks/usePasswordGenerator";
 import { NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
 
 const PasswordGenerator: NextPage = () => {
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [passwordCopied, setPasswordCopied] = useState(false);
-
   const {
     register,
-    handleSubmit,
+    handleGeneratePassword,
     watch,
     getValues,
     setValue,
-    formState: { errors },
-  } = useForm<IFormInput>();
-
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
-    // console.log(data);
-    if (
-      !data.includeNumber &&
-      !data.includeLowerCase &&
-      !data.includeUpperCase &&
-      !data.includeSpecialChar &&
-      !data.numberOnly
-    ) {
-      setError(true);
-      setErrorMsg("Choose minimum 1 option");
-      setTimeout(() => {
-        setError(false);
-        setErrorMsg("");
-      }, 5000);
-      return;
-    }
-    setPassword("");
-    const passwordList = [];
-    for (let i = 0; i < data.numOfPassword; i++) {
-      passwordList.push(generatePassword());
-    }
-    setPassword(passwordList.join("\n"));
-  };
-
-  const generateCharset = () => {
-    let charset = "";
-
-    if (getValues("numberOnly")) {
-      charset += numberChar;
-      return charset;
-    }
-    if (getValues("includeNumber")) {
-      charset += numberChar;
-    }
-    if (getValues("includeLowerCase")) {
-      charset += lowerCaseChar;
-    }
-    if (getValues("includeUpperCase")) {
-      charset += upperCaseChar;
-    }
-    if (getValues("includeSpecialChar")) {
-      if (getValues("useCustomChar")) {
-        charset += getValues("customChar");
-      } else {
-        charset += specialChar;
-      }
-    }
-    charset = Array.from(new Set(charset)).join("").replace(" ", "");
-
-    return charset;
-  };
-
-  const generatePassword = () => {
-    let password = "";
-    const charset = generateCharset();
-    const passwordLength = getValues("passwordLength");
-    for (let i = 0; i < Number.parseInt(passwordLength); i++) {
-      if (getValues("beginLetter")) {
-        if (i == 0) {
-          let tempChars = charset.replace(/[^a-zA-Z]+/g, "");
-          const random = Math.floor(Math.random() * tempChars.length);
-          const c = tempChars.charAt(random);
-          password += c;
-        }
-      }
-      const random = Math.floor(Math.random() * charset.length);
-      const c = charset.charAt(random);
-      password += c;
-    }
-
-    return password;
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(password);
-    setPasswordCopied(true);
-    setTimeout(() => {
-      setPasswordCopied(false);
-    }, 5000);
-  };
-
-  useEffect(() => {
-    setValue("customChar", specialChar);
-  }, [setValue]);
+    errors,
+    password,
+    error,
+    errorMsg,
+    passwordCopied,
+    handleCopy,
+  } = usePasswordGenerator();
 
   return (
     <>
@@ -121,7 +28,7 @@ const PasswordGenerator: NextPage = () => {
       <div className="main">
         <h1>Password Generator</h1>
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleGeneratePassword()}
           className="flex flex-col gap-2 w-full lg:w-3/4"
         >
           <div className="flex flex-col lg:flex-row justify-between items-center">
@@ -152,7 +59,10 @@ const PasswordGenerator: NextPage = () => {
                   max={10000}
                 />
               )}
-              <div className="tooltip tooltip-top flex items-center" data-tip="Custom Length">
+              <div
+                className="tooltip tooltip-top flex items-center"
+                data-tip="Custom Length"
+              >
                 <input
                   type="checkbox"
                   className="toggle"
