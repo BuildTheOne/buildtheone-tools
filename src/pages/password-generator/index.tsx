@@ -253,6 +253,7 @@ const PasswordGenerator: NextPage = () => {
               className="w-full textarea textarea-bordered resize-none whitespace-normal"
               defaultValue={password}
               wrap={"off"}
+              readOnly
             ></textarea>
           </div>
         </form>
